@@ -1,0 +1,40 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/rene/Desktop/IMS/DataContainer.cpp
+DataContainer.h
+/home/rene/Desktop/IMS/DataContainer.h
+
+/home/rene/Desktop/IMS/DataContainer.h
+
+/home/rene/Desktop/IMS/Worker.cpp
+Worker.h
+/home/rene/Desktop/IMS/Worker.h
+
+/home/rene/Desktop/IMS/Worker.h
+string
+-
+vector
+-
+algorithm
+-
+cstdio
+-
+iostream
+-
+
+/home/rene/Desktop/IMS/main.cpp
+iostream
+-
+getopt.h
+-
+Worker.h
+/home/rene/Desktop/IMS/Worker.h
+DataContainer.h
+/home/rene/Desktop/IMS/DataContainer.h
+
