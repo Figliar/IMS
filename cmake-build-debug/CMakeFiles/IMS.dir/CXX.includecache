@@ -6,17 +6,9 @@
 
 #IncludeRegexTransform: 
 
-/home/rene/Desktop/IMS/DataContainer.cpp
-DataContainer.h
-/home/rene/Desktop/IMS/DataContainer.h
+/home/rene/Desktop/IMS_projekt/IMS/DataContainer.h
 
-/home/rene/Desktop/IMS/DataContainer.h
-
-/home/rene/Desktop/IMS/Worker.cpp
-Worker.h
-/home/rene/Desktop/IMS/Worker.h
-
-/home/rene/Desktop/IMS/Worker.h
+/home/rene/Desktop/IMS_projekt/IMS/Worker.h
 string
 -
 vector
@@ -28,13 +20,13 @@ cstdio
 iostream
 -
 
-/home/rene/Desktop/IMS/main.cpp
+/home/rene/Desktop/IMS_projekt/IMS/main.cpp
 iostream
 -
 getopt.h
 -
 Worker.h
-/home/rene/Desktop/IMS/Worker.h
+/home/rene/Desktop/IMS_projekt/IMS/Worker.h
 DataContainer.h
-/home/rene/Desktop/IMS/DataContainer.h
+/home/rene/Desktop/IMS_projekt/IMS/DataContainer.h
 

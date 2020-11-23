@@ -4,42 +4,37 @@
 #include "DataContainer.h"
 using namespace std;
 
-#define PROBABILITY
+// TODO konstanty
+// Worker a DATAContainer
 #define GRID_WIDTH 75
 #define GRID_HEIGHT 75
-#define GRID_
-#define GRID_
+
+#define ITERATIONS 50
 class CellularAutomat{
+public:
+    CellularAutomat(){
+        bool open_positions[GRID_HEIGHT][GRID_WIDTH];
+        for(int x = 0; x < GRID_HEIGHT; x++){
+            for(int y = 0; y < GRID_WIDTH; y++){
+                open_positions[x][y] = false;
+            }
+        }
+        CellularAutomat::init_grid();
+    }
 
+    void init_grid(){
+
+    }
+
+    void create_worker(positions){
+        posi
+    }
 };
-
 
 
 int main(int argc, char *argv[]) {
 
     Worker worker = Worker();
-    static struct option long_options[] = {
-            {"help", optional_argument, nullptr, 'h'},
-            {"bus", optional_argument, nullptr, 'b'},
-            {nullptr, 0, nullptr, 0}
-    };
-    int arg;
-    while((arg = getopt_long(argc, argv, "hb:t", long_options, nullptr)) != EOF){
-        switch(arg){
-            case 'h': {
-                printf("For this help type argument: -h or --help");
-                break;
-            }
-            case 'b': {
-                const string typ = (optarg);
-                printf("%s\n", typ.c_str());
-                break;
-            }
-            default : {
-                printf("No arguments");
-                exit(-1);
-            }
-        }
-    }
+    CellularAutomat cellularAutomat = CellularAutomat();
     return 0;
 }
