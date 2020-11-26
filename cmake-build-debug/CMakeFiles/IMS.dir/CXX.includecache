@@ -19,6 +19,12 @@ cstdio
 -
 iostream
 -
+cstdlib
+-
+ctime
+-
+random
+-
 
 /home/rene/Desktop/IMS_projekt/IMS/main.cpp
 iostream
@@ -29,4 +35,6 @@ Worker.h
 /home/rene/Desktop/IMS_projekt/IMS/Worker.h
 DataContainer.h
 /home/rene/Desktop/IMS_projekt/IMS/DataContainer.h
+cstdlib
+-
 
