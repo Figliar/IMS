@@ -14,10 +14,10 @@
 #include <random>
 #include <cmath>
 
-#define GRID_WIDTH 75
-#define GRID_HEIGHT 75
+#define GRID_WIDTH 40
+#define GRID_HEIGHT 40
 
-#define WORKERS 500
+#define WORKERS 266
 #define ITERATIONS 50
 
 #define INITIAL_INFECTION_PROBABILITY 100 // 100 / 1000 = 0.1 * 5 = 0.5
@@ -156,6 +156,8 @@ public:
     bool dead;
 
     bool susceptible;
+
+    position *last_position;
 };
 
 #endif //IMS_WORKER_H

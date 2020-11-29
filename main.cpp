@@ -3,6 +3,7 @@
 #include "Worker.h"
 #include "DataContainer.h"
 #include <cstdlib>
+#include <cstdio>
 
 using namespace std;
 
@@ -80,10 +81,10 @@ public:
     bool move_worker(Worker *w, position p){
         position current_position = w->get_position();
         if(check_point(p)){
+            w->last_position = &w->pos;
+            this->grid[p.x][p.y] = w;
             w->set_position(p);
             this->grid[current_position.x][current_position.y] = nullptr;
-            this->grid[p.x][p.y] = w;
-//            this->show_grid();
             return true;
         }
         else{
@@ -98,7 +99,11 @@ public:
             this->kill_worker(w);
             return false;
         }
-        this->check_neighbors_n_SD(w);
+        if (w->social_distance) {
+            this->check_neighbors_SD(w);
+        } else {
+            this->check_neighbors_n_SD(w);
+        }
 //        cout<<"update_grid(end)"<<endl;
         return true;
     }
@@ -114,7 +119,7 @@ public:
                 position temp_p = w->pos;
                 temp_p.x = temp_p.x + x;
                 temp_p.y = temp_p.y + y;
-                if (check_point(temp_p)) {
+                if (check_point(temp_p) and w->last_position != &temp_p) {
                     w->empty_spots.push_back(temp_p);
                 } else {
                     if(!oob(temp_p)) {
@@ -130,9 +135,7 @@ public:
     bool check_neighbors_n_SD(Worker *w){
         this->check_neighbors(w);
         this->check_infection(w);
-//        cout<<endl<<"worker_ID: "<<w->id<<endl;
-//        cout<<"movement_prob: "<<w->movement_prob<<endl;
-//        cout<<"current_symptoms_stage: "<<w->current_symptom_stage<<endl;
+        w->last_position = &w->pos;
         if(random_int(1, 100) < w->movement_prob){
             for(int step = 0; step < MOVE_LENGTH; step++){
                 if (!w->empty_spots.empty()) {
@@ -144,6 +147,56 @@ public:
                 else{
                     break;
                 }
+            }
+        }
+        w->last_position = nullptr;
+        return true;
+    }
+
+
+    bool check_neighbors_SD(Worker *w){
+        this->check_neighbors(w);
+        this->check_infection(w);
+
+        int move_length_SD = w->empty_spots.size() < 8 ? 1 : MOVE_LENGTH;
+
+        if (w->empty_spots.size() < 8 or (random_int(1, 100) < w->movement_prob)){
+            for(int step = 0; step < move_length_SD; step++){
+                w->last_position = &w->pos;
+                bool did_move = false;
+                if (!w->empty_spots.empty()) {
+                    for(auto i = w->empty_spots.begin(); i <= w->empty_spots.end(); i++){
+                        unsigned int which = random_int(0, w->empty_spots.size() - 1);
+                        if(this->check_if_safe(w, w->empty_spots.at(which))){
+                            this->move_worker(w, w->empty_spots.at(which));
+                            this->check_neighbors(w);
+                            this->check_infection(w);
+                            did_move = true;
+                            break;
+                        }
+                        w->empty_spots.erase(w->empty_spots.begin() + which);
+                    }
+                    if(!did_move)
+                        break;
+                }
+                else{
+                    break;
+                }
+            }
+        }
+        w->last_position = nullptr;
+        return true;
+    }
+
+    bool check_if_safe(Worker *w, position i){
+        for (int y = -AREA; y <= AREA; y++) {
+            for (int x = -AREA; x <= AREA; x++) {
+                if (x == 0 and y == 0) {
+                    continue;
+                }
+                if(&i == w->last_position)
+                if(this->grid[i.x + x][i.y + y])
+                    return false;
             }
         }
         return true;
@@ -175,15 +228,15 @@ public:
             for(auto & x : open_position){
                 if(x != nullptr){
                     if(x->infected)
-                        cout<<"2";
+                        cout<<" 2 ";
 //                    cout<<"<"<<x->age<<">";
                     else if(x->recovered)
-                        cout<<"1";
+                        cout<<" 1 ";
                     else
-                        cout<<"0";
+                        cout<<" 0 ";
                 }
                 else{
-                    cout<<"-";
+                    cout<<" - ";
                 }
             }
             cout<<endl;

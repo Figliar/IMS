@@ -77,6 +77,7 @@ Worker::Worker(position position, int id) {
     Worker::num_people_infected = 0;
     Worker::movement_prob = MOVE_PROBABILITY;
     Worker::low_movement_prob = ALTRUISTIC_MOVEMENT_PROBABILITY;
+    Worker::last_position = nullptr;
 
     /*
      * Creating Infection periods
@@ -161,8 +162,7 @@ bool Worker::get_infected() {
         sum += float(BASE_INFECTION_PROBABILITY) + float(-1. * (int(i->wear_mask) * float(MASK_INFECTION_DECREASE_PROB)));
     }
     p = sum / this->infectious_spots.size();
-    float infection_probability = pow(1 - (1 - p), this->infectious_spots.size());
-
+    float infection_probability = pow(1 - (1 - p), this->infectious_spots.size()) * 100;
     if (random_int(1, 100) < infection_probability) {
         this->infected = true;
         this->susceptible = true;
