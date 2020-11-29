@@ -12,49 +12,150 @@
 #include <cstdlib>
 #include <ctime>
 #include <random>
+#include <cmath>
 
-#define INFECTED 2
-#define RECOVERED 1
-#define SUSCEPTIBLE 0
+#define GRID_WIDTH 75
+#define GRID_HEIGHT 75
 
-#define INITIAL_INFECTION_PROBABILITY 1000 // 100 / 1000 = 0.1 * 5 = 0.5
-#define SICK 14
+#define WORKERS 500
+#define ITERATIONS 50
+
+#define INITIAL_INFECTION_PROBABILITY 100 // 100 / 1000 = 0.1 * 5 = 0.5
 #define MAX_AGE 80
 #define MIN_AGE 18
-#define MAX_INCUBATION_DURATION 6
-#define MIN_INCUBATION_DURATION 4
-#define MAX_INFECTIOUS_DURATION 9
-#define MIN_INFECTIOUS_DURATION 8
+#define MOVE_PROBABILITY 50 //%
+#define ALTRUISTIC_PROBABILITY 75
+#define BASE_INFECTION_PROBABILITY 0.20
+#define MASK_INFECTION_DECREASE_PROB 0.10
 
-int random_int(int, int);
-unsigned short * current_time_nanoseconds();
+#define AREA 1
+#define MOVE_LENGTH 6
+#define ARRAY_SIZE int(pow(AREA * 2 + 1, 2) - 1)
+
+#define MIN_INCUBATION_DURATION 4
+#define MAX_INCUBATION_DURATION 6
+#define MIN_INFECTIOUS_DURATION 8
+#define MAX_INFECTIOUS_DURATION 9
+#define MIN_INFECTIOUS_START_BEFORE_SYMPTOMS 2
+#define MAX_INFECTIOUS_START_BEFORE_SYMPTOMS 3
+#define MIN_SEVERE_SYMPTOMS_START 2
+#define MAX_SEVERE_SYMPTOMS_START 4
+#define TOTAL_LENGTH_INFECTION 14
+#define DEATH_OCCURENCE_MIN 2
+#define DEATH_OCCURENCE_MAX 4
+
+#define ALTRUISTIC_MOVEMENT_PROBABILITY 25
+
+#define POLICY_SAFETY_VERYHIGH 75
+#define POLICY_SAFETY_HIGH 50
+#define POLICY_SAFETY_MEDIUM 25
+#define POLICY_SAFETY_LOW 10
+
 
 struct position{
     int x;
     int y;
 };
 
+struct periods {
+    std::vector<int> num;
+    std::vector<std::string> period;
+};
+
+struct permutations {
+    std::string array[4];
+};
+
+int random_int(int, int);
+
+std::string get_p(periods p, char c);
+
+int get_n(periods p, char c);
+
 class Worker {
 public:
 
-    Worker(position position);
+    explicit Worker(position position, int id);
 
-    void progress_infection();
+    bool progress_infection();
 
-    void get_infected();
-
-    int state;
-
-    int sick;
+    bool get_infected();
 
     int age;
 
     position pos{};
 
-    position get_position();
+    position get_position() const;
 
     void set_position(position p);
-};
 
+    int incubation_period_duration;
+
+    int infectious_period_duration;
+
+    int infectious_start_before_symptoms;
+
+    int severe_symptoms_start;
+
+    int infectious_period_start;
+
+    int total_length_infection;
+
+    int removed_period_start;
+
+    periods infectious_periods;
+
+    int total_length;
+
+    periods symptoms_periods;
+
+    int symptoms_start;
+
+    int severe_start_abs;
+
+    int fatality_start_abs;
+
+    int fatality_occur;
+
+    bool is_infectious() const;
+
+    std::string current_infection_stage;
+
+    std::string current_symptom_stage;
+
+    std::vector<permutations> possible_permutations;
+
+    bool wear_mask;
+
+    int infection_step;
+
+    bool altruistic;
+
+    int movement_prob{};
+
+    bool social_distance;
+
+    bool recovered;
+
+    bool infected;
+
+    bool wear_mask_before_symptoms;
+
+    bool social_distance_before_symptoms;
+
+    int id;
+
+    int num_people_infected;
+
+    std::vector<position> empty_spots;
+
+    std::vector<Worker> infectious_spots;
+
+    int low_movement_prob;
+
+    bool dead;
+
+    bool susceptible;
+};
 
 #endif //IMS_WORKER_H

@@ -8,6 +8,10 @@
 
 /home/rene/Desktop/IMS_projekt/IMS/DataContainer.h
 
+/home/rene/Desktop/IMS_projekt/IMS/Worker.cpp
+Worker.h
+/home/rene/Desktop/IMS_projekt/IMS/Worker.h
+
 /home/rene/Desktop/IMS_projekt/IMS/Worker.h
 string
 -
@@ -24,6 +28,8 @@ cstdlib
 ctime
 -
 random
+-
+cmath
 -
 
 /home/rene/Desktop/IMS_projekt/IMS/main.cpp
