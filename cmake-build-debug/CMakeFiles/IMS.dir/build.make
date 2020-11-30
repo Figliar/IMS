@@ -103,31 +103,31 @@ CMakeFiles/IMS.dir/Worker.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/IMS.dir/Worker.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/rene/Desktop/IMS_projekt/IMS/Worker.cpp -o CMakeFiles/IMS.dir/Worker.cpp.s
 
-CMakeFiles/IMS.dir/DataContainer.cpp.o: CMakeFiles/IMS.dir/flags.make
-CMakeFiles/IMS.dir/DataContainer.cpp.o: ../DataContainer.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/rene/Desktop/IMS_projekt/IMS/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/IMS.dir/DataContainer.cpp.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/IMS.dir/DataContainer.cpp.o -c /home/rene/Desktop/IMS_projekt/IMS/DataContainer.cpp
+CMakeFiles/IMS.dir/DataCollector.cpp.o: CMakeFiles/IMS.dir/flags.make
+CMakeFiles/IMS.dir/DataCollector.cpp.o: ../DataCollector.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/rene/Desktop/IMS_projekt/IMS/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/IMS.dir/DataCollector.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/IMS.dir/DataCollector.cpp.o -c /home/rene/Desktop/IMS_projekt/IMS/DataCollector.cpp
 
-CMakeFiles/IMS.dir/DataContainer.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/IMS.dir/DataContainer.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/rene/Desktop/IMS_projekt/IMS/DataContainer.cpp > CMakeFiles/IMS.dir/DataContainer.cpp.i
+CMakeFiles/IMS.dir/DataCollector.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/IMS.dir/DataCollector.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/rene/Desktop/IMS_projekt/IMS/DataCollector.cpp > CMakeFiles/IMS.dir/DataCollector.cpp.i
 
-CMakeFiles/IMS.dir/DataContainer.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/IMS.dir/DataContainer.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/rene/Desktop/IMS_projekt/IMS/DataContainer.cpp -o CMakeFiles/IMS.dir/DataContainer.cpp.s
+CMakeFiles/IMS.dir/DataCollector.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/IMS.dir/DataCollector.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/rene/Desktop/IMS_projekt/IMS/DataCollector.cpp -o CMakeFiles/IMS.dir/DataCollector.cpp.s
 
 # Object files for target IMS
 IMS_OBJECTS = \
 "CMakeFiles/IMS.dir/main.cpp.o" \
 "CMakeFiles/IMS.dir/Worker.cpp.o" \
-"CMakeFiles/IMS.dir/DataContainer.cpp.o"
+"CMakeFiles/IMS.dir/DataCollector.cpp.o"
 
 # External object files for target IMS
 IMS_EXTERNAL_OBJECTS =
 
 IMS: CMakeFiles/IMS.dir/main.cpp.o
 IMS: CMakeFiles/IMS.dir/Worker.cpp.o
-IMS: CMakeFiles/IMS.dir/DataContainer.cpp.o
+IMS: CMakeFiles/IMS.dir/DataCollector.cpp.o
 IMS: CMakeFiles/IMS.dir/build.make
 IMS: CMakeFiles/IMS.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/rene/Desktop/IMS_projekt/IMS/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Linking CXX executable IMS"

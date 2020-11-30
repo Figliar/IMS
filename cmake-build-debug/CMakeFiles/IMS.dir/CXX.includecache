@@ -6,9 +6,33 @@
 
 #IncludeRegexTransform: 
 
-/home/rene/Desktop/IMS_projekt/IMS/DataContainer.h
+/home/rene/Desktop/IMS_projekt/IMS/DataCollector.cpp
+DataCollector.h
+/home/rene/Desktop/IMS_projekt/IMS/DataCollector.h
 
-/home/rene/Desktop/IMS_projekt/IMS/Worker.cpp
+/home/rene/Desktop/IMS_projekt/IMS/DataCollector.h
+map
+-
+string
+-
+vector
+-
+algorithm
+-
+cstdio
+-
+iostream
+-
+cstdlib
+-
+ctime
+-
+random
+-
+cmath
+-
+map
+-
 Worker.h
 /home/rene/Desktop/IMS_projekt/IMS/Worker.h
 
@@ -31,18 +55,12 @@ random
 -
 cmath
 -
+map
+-
 
 /home/rene/Desktop/IMS_projekt/IMS/main.cpp
-iostream
--
-getopt.h
--
 Worker.h
 /home/rene/Desktop/IMS_projekt/IMS/Worker.h
-DataContainer.h
-/home/rene/Desktop/IMS_projekt/IMS/DataContainer.h
-cstdlib
--
-cstdio
--
+DataCollector.h
+/home/rene/Desktop/IMS_projekt/IMS/DataCollector.h
 

@@ -82,10 +82,10 @@
 				</MakeCommands>
 			</Target>
 		</Build>
-		<Unit filename="/home/rene/Desktop/IMS_projekt/IMS/DataContainer.cpp">
+		<Unit filename="/home/rene/Desktop/IMS_projekt/IMS/DataCollector.cpp">
 			<Option target="IMS"/>
 		</Unit>
-		<Unit filename="/home/rene/Desktop/IMS_projekt/IMS/DataContainer.h">
+		<Unit filename="/home/rene/Desktop/IMS_projekt/IMS/DataCollector.h">
 			<Option target="IMS"/>
 		</Unit>
 		<Unit filename="/home/rene/Desktop/IMS_projekt/IMS/Worker.cpp">

@@ -1,5 +1,5 @@
 file(REMOVE_RECURSE
-  "CMakeFiles/IMS.dir/DataContainer.cpp.o"
+  "CMakeFiles/IMS.dir/DataCollector.cpp.o"
   "CMakeFiles/IMS.dir/Worker.cpp.o"
   "CMakeFiles/IMS.dir/main.cpp.o"
   "IMS"

@@ -143,32 +143,32 @@ IMS/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/IMS.dir/build.make CMakeFiles/IMS.dir/build
 .PHONY : IMS/fast
 
-DataContainer.o: DataContainer.cpp.o
+DataCollector.o: DataCollector.cpp.o
 
-.PHONY : DataContainer.o
+.PHONY : DataCollector.o
 
 # target to build an object file
-DataContainer.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/IMS.dir/build.make CMakeFiles/IMS.dir/DataContainer.cpp.o
-.PHONY : DataContainer.cpp.o
+DataCollector.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/IMS.dir/build.make CMakeFiles/IMS.dir/DataCollector.cpp.o
+.PHONY : DataCollector.cpp.o
 
-DataContainer.i: DataContainer.cpp.i
+DataCollector.i: DataCollector.cpp.i
 
-.PHONY : DataContainer.i
+.PHONY : DataCollector.i
 
 # target to preprocess a source file
-DataContainer.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/IMS.dir/build.make CMakeFiles/IMS.dir/DataContainer.cpp.i
-.PHONY : DataContainer.cpp.i
+DataCollector.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/IMS.dir/build.make CMakeFiles/IMS.dir/DataCollector.cpp.i
+.PHONY : DataCollector.cpp.i
 
-DataContainer.s: DataContainer.cpp.s
+DataCollector.s: DataCollector.cpp.s
 
-.PHONY : DataContainer.s
+.PHONY : DataCollector.s
 
 # target to generate assembly for a file
-DataContainer.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/IMS.dir/build.make CMakeFiles/IMS.dir/DataContainer.cpp.s
-.PHONY : DataContainer.cpp.s
+DataCollector.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/IMS.dir/build.make CMakeFiles/IMS.dir/DataCollector.cpp.s
+.PHONY : DataCollector.cpp.s
 
 Worker.o: Worker.cpp.o
 
@@ -233,9 +233,9 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... IMS"
-	@echo "... DataContainer.o"
-	@echo "... DataContainer.i"
-	@echo "... DataContainer.s"
+	@echo "... DataCollector.o"
+	@echo "... DataCollector.i"
+	@echo "... DataCollector.s"
 	@echo "... Worker.o"
 	@echo "... Worker.i"
 	@echo "... Worker.s"

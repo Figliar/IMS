@@ -13,11 +13,12 @@
 #include <ctime>
 #include <random>
 #include <cmath>
+#include <map>
 
-#define GRID_WIDTH 40
-#define GRID_HEIGHT 40
+#define GRID_WIDTH 75
+#define GRID_HEIGHT 75
 
-#define WORKERS 266
+#define WORKERS 500
 #define ITERATIONS 50
 
 #define INITIAL_INFECTION_PROBABILITY 100 // 100 / 1000 = 0.1 * 5 = 0.5
@@ -62,15 +63,17 @@ struct periods {
     std::vector<std::string> period;
 };
 
-struct permutations {
-    std::string array[4];
-};
+//struct permutations {
+//    std::string array[4];
+//};
 
 int random_int(int, int);
 
-std::string get_p(periods p, char c);
+std::string get_p(const periods& p, char c);
 
-int get_n(periods p, char c);
+int get_n(const periods& p, char c);
+
+using namespace std;
 
 class Worker {
 public:
@@ -103,11 +106,11 @@ public:
 
     int removed_period_start;
 
-    periods infectious_periods;
+    periods *infectious_periods = new periods;
 
     int total_length;
 
-    periods symptoms_periods;
+    periods *symptoms_periods = new periods;
 
     int symptoms_start;
 
@@ -123,7 +126,7 @@ public:
 
     std::string current_symptom_stage;
 
-    std::vector<permutations> possible_permutations;
+//    std::vector<permutations> possible_permutations;
 
     bool wear_mask;
 
@@ -131,7 +134,7 @@ public:
 
     bool altruistic;
 
-    int movement_prob{};
+    int movement_prob;
 
     bool social_distance;
 
@@ -147,9 +150,10 @@ public:
 
     int num_people_infected;
 
-    std::vector<position> empty_spots;
+    // TODO free()
+    vector<position> *empty_spots = new vector<position>;
 
-    std::vector<Worker> infectious_spots;
+    vector<Worker> *infectious_spots = new vector<Worker>;
 
     int low_movement_prob;
 
@@ -157,7 +161,14 @@ public:
 
     bool susceptible;
 
-    position *last_position;
+    position *last_position = new position;
+
+    map<string, int> *infectious_days_info = new map<string, int>;
+
+    int SD;
+    int not_SD;
+    int not_WM;
+    int WM;
 };
 
 #endif //IMS_WORKER_H

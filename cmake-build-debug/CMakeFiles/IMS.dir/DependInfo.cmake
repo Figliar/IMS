@@ -4,7 +4,7 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/home/rene/Desktop/IMS_projekt/IMS/DataContainer.cpp" "/home/rene/Desktop/IMS_projekt/IMS/cmake-build-debug/CMakeFiles/IMS.dir/DataContainer.cpp.o"
+  "/home/rene/Desktop/IMS_projekt/IMS/DataCollector.cpp" "/home/rene/Desktop/IMS_projekt/IMS/cmake-build-debug/CMakeFiles/IMS.dir/DataCollector.cpp.o"
   "/home/rene/Desktop/IMS_projekt/IMS/Worker.cpp" "/home/rene/Desktop/IMS_projekt/IMS/cmake-build-debug/CMakeFiles/IMS.dir/Worker.cpp.o"
   "/home/rene/Desktop/IMS_projekt/IMS/main.cpp" "/home/rene/Desktop/IMS_projekt/IMS/cmake-build-debug/CMakeFiles/IMS.dir/main.cpp.o"
   )
