@@ -169,6 +169,7 @@ public:
     int not_SD;
     int not_WM;
     int WM;
+    bool ali;
 };
 
 #endif //IMS_WORKER_H

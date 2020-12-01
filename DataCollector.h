@@ -57,15 +57,41 @@ public:
 
     void update_adv_infection_data(Worker *pWorker);
 
-    void reset();
+    void reset(int timestamp, bool last);
 
 //    void add_lifetime_infected(int i, map<string, int> map);
 
-
     int save_experiment;
+
     int basic_to_print;
 
     void reset_data_options(bool hist);
+
+    int lifetime_infected_bin_size;
+
+    map<string, int> lifetime_infected_bin_avgs[ITERATIONS];
+
+    map<string, int> last_bin_avgs;
+
+    void add_lifetime_infected(int i, map<string, int> map);
+
+    vector<map<string, int>> current_bin_lifetime_infected;
+
+    void increment_initial_infected();
+
+    int initial_infected;
+
+    void increment_newly_infected();
+
+    int newly_infected;
+
+    int get_total_infected();
+
+    void add_lifetime_infected(Worker *worker);
+
+    void increment_initial_recovered();
+
+    int initial_recovered;
 };
 
 

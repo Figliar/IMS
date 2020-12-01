@@ -53,20 +53,23 @@ public:
         if(check_point(p)){
             auto *worker = new Worker(p, ID);
             this->grid[p.x][p.y] = worker;
-            if(!worker->infected){
-//                this->dataCollector.increment_initial_S();
+            if(worker->infected){
+                this->dataCollector.increment_initial_infected();
             }
-//            this->dataCollector.update_data(worker);
+            else if(worker->susceptible){
+                this->dataCollector.increment_initial_S();
+            }
+            this->dataCollector.update_data(worker);
             if(worker->social_distance)
-                ids_social_distance->push_back(worker->id);
+                this->ids_social_distance->push_back(worker->id);
             else
-                ids_not_social_distance->push_back(worker->id);
+                this->ids_not_social_distance->push_back(worker->id);
         }
 //        cout<<"create_worker(end)"<<endl;
     }
 
     void kill_worker(Worker *w){
-//        this->dataCollector.increment_dead();
+        this->dataCollector.increment_dead();
         w->dead = true;
         this->grid[w->pos.x][w->pos.y] = nullptr;
     }
@@ -89,11 +92,14 @@ public:
     }
 
     bool update_worker(Worker* w){
-        cout<<"update_worker(start)"<<endl;
+//        cout<<"update_worker(start)"<<endl;
         bool dead = w->progress_infection();
         if(dead){
             this->kill_worker(w);
             return false;
+        }
+        if(w->ali){
+//            this->dataCollector.add_lifetime_infected(w);
         }
         if (w->social_distance) {
             this->check_neighbors_SD(w);
@@ -103,7 +109,7 @@ public:
 //            this->check_neighbors_SD(w);
         }
 
-        cout<<"update_grid(end)"<<endl;
+//        cout<<"update_grid(end)"<<endl;
         return true;
     }
 
@@ -203,6 +209,7 @@ public:
     void check_infection(Worker *w){
         bool newly_infected = w->get_infected();
         if(newly_infected){
+            this->dataCollector.increment_newly_infected();
             for(auto i = w->infectious_spots->begin(); i <= w->infectious_spots->end(); i++){
                 i->num_people_infected +=1;
             }
@@ -211,11 +218,65 @@ public:
 
     void update_grid(){
 //        cout<<"update_grid(start)"<<endl;
+//        vector<int> new_SD_list;
+//        vector<int> new_not_SD_list;
+//        for (auto w = *this->ids_not_social_distance->begin(); w != *this->ids_not_social_distance->end(); w++){
+//            if(!workers[w]->dead){
+//                this->update_worker(workers[w]);
+//                bool new_SD = workers[w]->social_distance;
+//                if(workers[w]->dead) continue;
+//                if(new_SD) new_SD_list.push_back(workers[w]->id);
+//                this->dataCollector.update_data(workers[w]);
+//            }
+//        }
+//        for (auto w = *this->ids_social_distance->begin(); w != *this->ids_social_distance->end(); w++){
+//            if(!workers[w]->dead){
+//                this->update_worker(workers[w]);
+//                bool new_SD = workers[w]->social_distance;
+//                if(workers[w]->dead) continue;
+//                if(!new_SD) new_not_SD_list.push_back(workers[w]->id);
+//                this->dataCollector.update_data(workers[w]);
+//            }
+//        }
+//
+//        for(auto &id : new_SD_list){
+////            this->ids_not_social_distance->erase(this->ids_not_social_distance->begin() + id);
+//            this->ids_social_distance->push_back(id);
+//            for(auto &i : *this->ids_not_social_distance) {
+//                if(i == id){
+//                    this->ids_not_social_distance->erase(this->ids_not_social_distance->begin() + i);
+//                }
+//            }
+//        }
+//        for(auto &id : new_not_SD_list){
+////            this->ids_social_distance->erase(this->ids_social_distance->begin() + id);
+//            this->ids_not_social_distance->push_back(id);
+//            for(auto &i : *this->ids_social_distance) {
+//                if(i == id){
+//                    this->ids_social_distance->erase(this->ids_social_distance->begin() + i);
+//                }
+//            }
+//        }
+//        for(auto i: *ids_not_social_distance) {
+//            cout << i << endl;
+//        }
+//        for(auto i: *ids_social_distance) {
+//            cout << i << endl;
+//        }
         for(auto & worker : this->workers){
-            if(!worker->dead)
+            if(!worker->dead and !worker->social_distance) {
                 this->update_worker(worker);
+                if (worker->dead) continue;
+                this->dataCollector.update_data(worker);
+            }
         }
-//        cout<<"update_grid(end)"<<endl;
+        for(auto & worker : this->workers){
+            if(!worker->dead and worker->social_distance) {
+                this->update_worker(worker);
+                if (worker->dead) continue;
+                this->dataCollector.update_data(worker);
+            }
+        }
     }
 
     /*
@@ -269,19 +330,40 @@ public:
     }
 
     int run(){
-        for(int i = 0; i < ITERATIONS; i++){
-//            this->dataCollector.reset();
+        int i;
+        for(i = 0; i < ITERATIONS; i++){
+            this->dataCollector.reset(i, false);
             this->update_grid();
+            cout<<i<<"====================="<<endl;
+            cout<<"Initial_susceptible:     "<<dataCollector.initial_S<<endl;
+            cout<<"Newly_infected:          "<<dataCollector.newly_infected<<endl;
+            cout<<"Initial_infected:        "<<dataCollector.initial_infected<<endl;
+            cout<<"Total_infected:          "<<dataCollector.get_total_infected()<<endl;
+            cout<<"End dead:                "<<dataCollector.total_dead<<endl;
+            cout<<"End Susceptible:         "<<dataCollector.current_data["S"]<<endl;
+            cout<<"End infected:            "<<dataCollector.current_data["I"]<<endl;
+            cout<<"All recovered:           "<<dataCollector.current_data["R"]<<endl;
+            cout<<"All wear_mask:   "<<dataCollector.current_data["WM"]<<endl;
+            cout<<"All social_d:    "<<dataCollector.current_data["SD"]<<endl;
+            cout<<"All mild:        "<<dataCollector.current_data["mild"]<<endl;
+            cout<<"All severe:      "<<dataCollector.current_data["severe"]<<endl;
+            cout<<"All asymptomatic:"<<dataCollector.current_data["asymptomatic"]<<endl;
         }
         this->show_grid();
+        for( auto & data : dataCollector.current_data){
+            cout<<data.first<<endl;
+            for( auto & more : dataCollector.data_history[data.first])
+                cout<<more<<", ";
+            cout<<endl;
+        }
+        cout<<dataCollector.current_data["death"]<<endl;
+        dataCollector.reset(i + 1, true);
         for(auto w : workers){
             free(w->symptoms_periods);
             free(w->infectious_periods);
             free(w->empty_spots);
             free(w->infectious_spots);
         }
-//        free(this->workers);
-//        free(this->grid);
         free(ids_not_social_distance);
         free(ids_social_distance);
         return 1;
@@ -299,7 +381,6 @@ int main(int argc, char *argv[]) {
     auto *cellularAutomat = new CellularAutomat(data_collector);
     cellularAutomat->show_grid();
     cellularAutomat->run();
-    data_collector.reset();
     return 0;
 
 }

@@ -6,7 +6,7 @@
 
 using namespace std;
 
-int policy = POLICY_SAFETY_MEDIUM;
+int policy = POLICY_SAFETY_VERYHIGH;
 
 int get_n(const periods& p, char c){
     int result;
@@ -52,18 +52,15 @@ Worker::Worker(position position, int id) {
     Worker::id = id;
     if(random <= 5) {
         Worker::infected = true;
-        Worker::susceptible = false;
+        Worker::susceptible = !this->infected;
         Worker::recovered = false;
-    }else if(random <= 90){
-        Worker::susceptible = true;
+    }else if(random <= 100){
         Worker::recovered = false;
         Worker::infected = false;
-    }else{
-        Worker::recovered = true;
-        Worker::susceptible = false;
-        Worker::infected = false;
-
+        Worker::susceptible = !this->infected;
     }
+
+    Worker::ali = false;
     Worker::pos = position;
     Worker::age = random_int(MIN_AGE, MAX_AGE);
     Worker::dead = false;
@@ -107,10 +104,10 @@ Worker::Worker(position position, int id) {
     Worker::symptoms_periods->num.push_back(0);
     Worker::symptoms_periods->period.emplace_back("incubation");
     Worker::symptoms_start = Worker::incubation_period_duration;
-    if(Worker::symptoms_start < Worker::infectious_period_start)
-        cout<<"Symptoms ("<<Worker::symptoms_start<<") start during infectious stage (starts "<<infectious_period_start<<")"<<endl;
-    if(Worker::symptoms_start > Worker::removed_period_start)
-        cout<<"Symptoms ("<<Worker::symptoms_start<<") start during infectious stage (starts "<<infectious_period_start<<")"<<endl;
+//    if(Worker::symptoms_start < Worker::infectious_period_start)
+//        cout<<"Symptoms ("<<Worker::symptoms_start<<") start during infectious stage (starts "<<infectious_period_start<<")"<<endl;
+//    if(Worker::symptoms_start > Worker::removed_period_start)
+//        cout<<"Symptoms ("<<Worker::symptoms_start<<") start during infectious stage (starts "<<infectious_period_start<<")"<<endl;
     // 1) Some people are asymptomatic (and have no mild or severe symptoms, and also cant die)
     if(random_int(1, 100) <= 35) {
         Worker::symptoms_periods->num.push_back(Worker::symptoms_start);
@@ -138,14 +135,6 @@ Worker::Worker(position position, int id) {
         Worker::symptoms_periods->num.push_back(Worker::total_length);
         Worker::symptoms_periods->period.emplace_back("recover");
     }
-
-//    Worker::possible_permutations.push_back({"incubation", "asymptomatic", "recover"});
-//    Worker::possible_permutations.push_back({"incubation", "mild", "recover"});
-//    Worker::possible_permutations.push_back({"incubation", "mild", "severe", "death"});
-//    Worker::possible_permutations.push_back({"incubation", "mild", "severe", "recover"});
-//    pristup k polozkam
-//    for(auto &i: possible_permutations)
-//        cout<<i.array[2]<<endl;
 
     Worker::current_symptom_stage = "NONE";
     Worker::current_infection_stage = "NONE";
@@ -180,16 +169,16 @@ bool Worker::get_infected() {
         this->symptoms_periods->period.erase(this->symptoms_periods->period.begin());
         this->symptoms_periods->num.erase(this->symptoms_periods->num.begin());
         this->infection_step = 0;
-//        data_collector.increment_total_infected();
         return true;
     }
     return false;
 }
 
 bool Worker::progress_infection() {
-    cout<<"progress_infection(start)"<<endl;
+//    cout<<"progress_infection(start)"<<endl;
+    this->ali = false;
     if(!this->infected) {
-        cout << "!this->infected;"<<endl;
+//        cout << "!this->infected;"<<endl;
         return false;
     }
 
@@ -208,7 +197,7 @@ bool Worker::progress_infection() {
     bool new_infection_stage = false;
     bool new_symptoms_stage = false;
 
-    cout<<"bool new_symptoms_stage = false;"<<endl;
+//    cout<<"bool new_symptoms_stage = false;"<<endl;
     if(this->infection_step == get_n(*this->infectious_periods, 'f')){
         this->current_infection_stage = get_p(*this->infectious_periods, 'f');
         this->infectious_periods->num.erase(this->infectious_periods->num.begin());
@@ -216,15 +205,15 @@ bool Worker::progress_infection() {
         new_infection_stage = true;
     }
 
-    cout<<"new_infection_stage = true;"<<endl;
+//    cout<<"new_infection_stage = true;"<<endl;
     if(this->infection_step == get_n(*this->symptoms_periods, 'f')){
-        this->current_symptom_stage = get_p(*this->infectious_periods, 'f');
+        this->current_symptom_stage = get_p(*this->symptoms_periods, 'f');
         this->symptoms_periods->num.erase(this->symptoms_periods->num.begin());
         this->symptoms_periods->period.erase(this->symptoms_periods->period.begin());
         new_symptoms_stage = true;
     }
 
-    cout<<"new_symptoms_stage = true;"<<endl;
+//    cout<<"new_symptoms_stage = true;"<<endl;
     if(this->current_symptom_stage == "death"){
         return true;
     }
@@ -254,7 +243,7 @@ bool Worker::progress_infection() {
         this->social_distance = this->social_distance_before_symptoms;
         this->movement_prob = this->removed_period_start;
         this->current_symptom_stage = "NONE";
-
+        this->ali = true;
 //        data_collector.add_lifetime_infected(this->num_people_infected, this->infectious_days_info);
         //todo data_collector
     }
