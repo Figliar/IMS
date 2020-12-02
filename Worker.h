@@ -30,6 +30,7 @@
 #define MOVE_LENGTH 6
 #define INITIAL_INFECTION_PROBABILITY 5 // %
 #define ALTRUISTIC_PROBABILITY 75       // %
+#define POLICY_SAFETY_PERFECT 100       // %
 #define POLICY_SAFETY_VERYHIGH 75       // %
 #define POLICY_SAFETY_HIGH 50           // %
 #define POLICY_SAFETY_MEDIUM 25         // %
