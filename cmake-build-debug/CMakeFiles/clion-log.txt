@@ -1,4 +1,4 @@
-/snap/clion/135/bin/cmake/linux/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" /home/rene/Desktop/IMS_projekt/IMS
+/snap/clion/137/bin/cmake/linux/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" /home/rene/Desktop/IMS_projekt/IMS
 -- Configuring done
 -- Generating done
 -- Build files have been written to: /home/rene/Desktop/IMS_projekt/IMS/cmake-build-debug

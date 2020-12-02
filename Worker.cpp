@@ -6,8 +6,11 @@
 
 using namespace std;
 
-int policy = POLICY_SAFETY_VERYHIGH;
+int policy = POLICY_SAFETY_LOW;
 
+/*
+ * Funkcia sluzi na ziskanie numerickych hodnot zaciatkov jednotlivych stadii choroby
+ */
 int get_n(const periods& p, char c){
     int result;
     if(c == 'l')
@@ -23,6 +26,9 @@ int get_n(const periods& p, char c){
     return result;
 }
 
+/*
+ * Funkcia sluzi na ziskanie period zaciatkov jednotlivych stadii choroby
+ */
 std::string get_p(const periods& p, char c){
     std::string result;
     if(c == 'l')
@@ -38,6 +44,7 @@ std::string get_p(const periods& p, char c){
     return result;
 }
 
+
 int random_int(int min, int max){
     std::random_device os_seed;
     const uint_least32_t seed = os_seed();
@@ -50,17 +57,16 @@ int random_int(int min, int max){
 Worker::Worker(position position, int id) {
     int random = random_int(1, INITIAL_INFECTION_PROBABILITY);
     Worker::id = id;
-    if(random <= 5) {
+    if(random <= 50) {
         Worker::infected = true;
         Worker::susceptible = !this->infected;
         Worker::recovered = false;
-    }else if(random <= 100){
+    }else if(random <= 1000){
         Worker::recovered = false;
         Worker::infected = false;
         Worker::susceptible = !this->infected;
     }
 
-    Worker::ali = false;
     Worker::pos = position;
     Worker::age = random_int(MIN_AGE, MAX_AGE);
     Worker::dead = false;
@@ -74,6 +80,7 @@ Worker::Worker(position position, int id) {
     Worker::movement_prob = MOVE_PROBABILITY;
     Worker::low_movement_prob = ALTRUISTIC_MOVEMENT_PROBABILITY;
     Worker::last_position = nullptr;
+    Worker::movement_prob_before_symptoms = this->movement_prob;
 
     /*
      * Creating Infection periods
@@ -157,9 +164,9 @@ bool Worker::get_infected() {
     for(auto i = this->infectious_spots->begin(); i < this->infectious_spots->end(); i++){
         sum += float(BASE_INFECTION_PROBABILITY) + float(-1. * (int(i->wear_mask) * float(MASK_INFECTION_DECREASE_PROB)));
     }
-    p = sum / this->infectious_spots->size();
+    p = sum / double(this->infectious_spots->size());
     auto infection_probability = float(pow(1 - (1 - p), this->infectious_spots->size()) * 100);
-    if (random_int(1, 100) < infection_probability) {
+    if (random_int(1, 100) < int(infection_probability)) {
         this->infected = true;
         this->susceptible = true;
         this->current_symptom_stage = get_p(*this->symptoms_periods, 'f');
@@ -176,9 +183,7 @@ bool Worker::get_infected() {
 
 bool Worker::progress_infection() {
 //    cout<<"progress_infection(start)"<<endl;
-    this->ali = false;
     if(!this->infected) {
-//        cout << "!this->infected;"<<endl;
         return false;
     }
 
@@ -197,7 +202,6 @@ bool Worker::progress_infection() {
     bool new_infection_stage = false;
     bool new_symptoms_stage = false;
 
-//    cout<<"bool new_symptoms_stage = false;"<<endl;
     if(this->infection_step == get_n(*this->infectious_periods, 'f')){
         this->current_infection_stage = get_p(*this->infectious_periods, 'f');
         this->infectious_periods->num.erase(this->infectious_periods->num.begin());
@@ -205,7 +209,6 @@ bool Worker::progress_infection() {
         new_infection_stage = true;
     }
 
-//    cout<<"new_infection_stage = true;"<<endl;
     if(this->infection_step == get_n(*this->symptoms_periods, 'f')){
         this->current_symptom_stage = get_p(*this->symptoms_periods, 'f');
         this->symptoms_periods->num.erase(this->symptoms_periods->num.begin());
@@ -213,23 +216,19 @@ bool Worker::progress_infection() {
         new_symptoms_stage = true;
     }
 
-//    cout<<"new_symptoms_stage = true;"<<endl;
     if(this->current_symptom_stage == "death"){
+        this->susceptible = false;
         return true;
     }
-
-    bool new_SD = false;
 
     if(this->current_symptom_stage == "mild" and this->altruistic and new_symptoms_stage){
         this->movement_prob = ALTRUISTIC_MOVEMENT_PROBABILITY;
         this->wear_mask = true;
-        new_SD = (!this->social_distance);
         this->social_distance = true;
     }
     else if(this->current_symptom_stage == "severe" and new_symptoms_stage){
         this->movement_prob = 0;
         this->wear_mask = true;
-        new_SD = (!this->social_distance);
         this->social_distance = true;
     }
 
@@ -238,14 +237,9 @@ bool Worker::progress_infection() {
         this->infected = false;
         this->susceptible = false;
         this->wear_mask = this->wear_mask_before_symptoms;
-        new_SD =
-                this->social_distance != this->social_distance_before_symptoms && this->social_distance_before_symptoms;
         this->social_distance = this->social_distance_before_symptoms;
-        this->movement_prob = this->removed_period_start;
+        this->movement_prob = this->movement_prob_before_symptoms;
         this->current_symptom_stage = "NONE";
-        this->ali = true;
-//        data_collector.add_lifetime_infected(this->num_people_infected, this->infectious_days_info);
-        //todo data_collector
     }
     return false;
 }

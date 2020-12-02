@@ -61,10 +61,6 @@ public:
 
 //    void add_lifetime_infected(int i, map<string, int> map);
 
-    int save_experiment;
-
-    int basic_to_print;
-
     void reset_data_options(bool hist);
 
     int lifetime_infected_bin_size;
@@ -73,7 +69,7 @@ public:
 
     map<string, int> last_bin_avgs;
 
-    void add_lifetime_infected(int i, map<string, int> map);
+    void add_lifetime_infected(Worker *worker);
 
     vector<map<string, int>> current_bin_lifetime_infected;
 
@@ -86,8 +82,6 @@ public:
     int newly_infected;
 
     int get_total_infected();
-
-    void add_lifetime_infected(Worker *worker);
 
     void increment_initial_recovered();
 

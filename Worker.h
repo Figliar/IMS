@@ -21,7 +21,7 @@
 #define WORKERS 500
 #define ITERATIONS 50
 
-#define INITIAL_INFECTION_PROBABILITY 100 // 100 / 1000 = 0.1 * 5 = 0.5
+#define INITIAL_INFECTION_PROBABILITY 1000 // 100 / 1000 = 0.1 * 5 = 0.5
 #define MAX_AGE 80
 #define MIN_AGE 18
 #define MOVE_PROBABILITY 50 //%
@@ -161,7 +161,7 @@ public:
 
     bool susceptible;
 
-    position *last_position = new position;
+    position *last_position;
 
     map<string, int> *infectious_days_info = new map<string, int>;
 
@@ -170,6 +170,7 @@ public:
     int not_WM;
     int WM;
     bool ali;
+    int movement_prob_before_symptoms;
 };
 
 #endif //IMS_WORKER_H
