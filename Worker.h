@@ -15,24 +15,30 @@
 #include <cmath>
 #include <map>
 
+// GRID CONSTANTS
 #define GRID_WIDTH 75
 #define GRID_HEIGHT 75
-
 #define WORKERS 500
 #define ITERATIONS 50
+#define AREA 1 // ake velke okolie berie do uvahy
 
-#define INITIAL_INFECTION_PROBABILITY 1000 // 100 / 1000 = 0.1 * 5 = 0.5
-#define MAX_AGE 80
+// WORKER CONSTANTS
 #define MIN_AGE 18
-#define MOVE_PROBABILITY 50 //%
-#define ALTRUISTIC_PROBABILITY 75
+#define MAX_AGE 80
+#define MOVE_PROBABILITY 50 // %
+#define ALTRUISTIC_MOVEMENT_PROBABILITY 25
+#define MOVE_LENGTH 6
+#define INITIAL_INFECTION_PROBABILITY 5 // %
+#define ALTRUISTIC_PROBABILITY 75       // %
+#define POLICY_SAFETY_VERYHIGH 75       // %
+#define POLICY_SAFETY_HIGH 50           // %
+#define POLICY_SAFETY_MEDIUM 25         // %
+#define POLICY_SAFETY_LOW 10            // %
+
+// DISEASE CONSTANTS
 #define BASE_INFECTION_PROBABILITY 0.20
 #define MASK_INFECTION_DECREASE_PROB 0.10
-
-#define AREA 1
-#define MOVE_LENGTH 6
-#define ARRAY_SIZE int(pow(AREA * 2 + 1, 2) - 1)
-
+#define TOTAL_LENGTH_INFECTION 14
 #define MIN_INCUBATION_DURATION 4
 #define MAX_INCUBATION_DURATION 6
 #define MIN_INFECTIOUS_DURATION 8
@@ -41,36 +47,41 @@
 #define MAX_INFECTIOUS_START_BEFORE_SYMPTOMS 3
 #define MIN_SEVERE_SYMPTOMS_START 2
 #define MAX_SEVERE_SYMPTOMS_START 4
-#define TOTAL_LENGTH_INFECTION 14
-#define DEATH_OCCURENCE_MIN 2
-#define DEATH_OCCURENCE_MAX 4
+#define DEATH_OCCURRENCE_MIN 2
+#define DEATH_OCCURRENCE_MAX 4
+#define ASYMPTOMATIC_PROBABILITY 35 // %
+#define DEATH_PROBABILITY 49 // %
+#define SEVERITY_PROBABILITY 19 // %
 
-#define ALTRUISTIC_MOVEMENT_PROBABILITY 25
-
-#define POLICY_SAFETY_VERYHIGH 75
-#define POLICY_SAFETY_HIGH 50
-#define POLICY_SAFETY_MEDIUM 25
-#define POLICY_SAFETY_LOW 10
-
-
+/*
+ * Struktura 2D pozicie predstavuje dvojicu suradnic (x, y)
+ */
 struct position{
     int x;
     int y;
 };
 
+/*
+ * Struktura dvoch vektorov pre periody symptomov a infekcie
+ */
 struct periods {
     std::vector<int> num;
     std::vector<std::string> period;
 };
 
-//struct permutations {
-//    std::string array[4];
-//};
-
+/*
+ * Funkcia na generovanie pseudonahodnych cisel pomocou casu
+ */
 int random_int(int, int);
 
+/*
+ * Funkcia sluzi na ziskanie period zaciatkov jednotlivych stadii choroby
+ */
 std::string get_p(const periods& p, char c);
 
+/*
+ * Funkcia sluzi na ziskanie numerickych hodnot zaciatkov jednotlivych stadii choroby
+ */
 int get_n(const periods& p, char c);
 
 using namespace std;
@@ -78,19 +89,39 @@ using namespace std;
 class Worker {
 public:
 
+    /*
+    * Konstruktor pracovnika inicializuje vsetky potrebne premenne
+    */
     explicit Worker(position position, int id);
 
+    /*
+    * Funkcia ktora rozhoduje ci sa pracovnik nakazy
+    */
+    bool get_infected();
+
+    /*
+    * Funkcia na progresovanie infekcie u nakazenych pracovnikov
+    */
     bool progress_infection();
 
-    bool get_infected();
+    /*
+    * Funkcia vrati poziciu pracovnika
+    */
+    position get_position() const;
+
+    /*
+    * Funkcia nastavuje polohu pracovnikovi
+    */
+    void set_position(position p);
+
+    /*
+    * Funkcia vracia ci je pracovnik infekcny
+    */
+    bool is_infectious() const;
 
     int age;
 
     position pos{};
-
-    position get_position() const;
-
-    void set_position(position p);
 
     int incubation_period_duration;
 
@@ -120,13 +151,9 @@ public:
 
     int fatality_occur;
 
-    bool is_infectious() const;
-
     std::string current_infection_stage;
 
     std::string current_symptom_stage;
-
-//    std::vector<permutations> possible_permutations;
 
     bool wear_mask;
 
@@ -150,7 +177,6 @@ public:
 
     int num_people_infected;
 
-    // TODO free()
     vector<position> *empty_spots = new vector<position>;
 
     vector<Worker> *infectious_spots = new vector<Worker>;
@@ -163,13 +189,10 @@ public:
 
     position *last_position;
 
-    map<string, int> *infectious_days_info = new map<string, int>;
-
     int SD;
     int not_SD;
     int not_WM;
     int WM;
-    bool ali;
     int movement_prob_before_symptoms;
 };
 

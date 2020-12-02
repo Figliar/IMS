@@ -6,11 +6,11 @@
 
 using namespace std;
 
-int policy = POLICY_SAFETY_LOW;
-
 /*
- * Funkcia sluzi na ziskanie numerickych hodnot zaciatkov jednotlivych stadii choroby
+ * Nastavujeme ake vysoke percento pracovnikov bude dodrziavat restrikcie
  */
+int policy = POLICY_SAFETY_VERYHIGH;
+
 int get_n(const periods& p, char c){
     int result;
     if(c == 'l')
@@ -26,9 +26,6 @@ int get_n(const periods& p, char c){
     return result;
 }
 
-/*
- * Funkcia sluzi na ziskanie period zaciatkov jednotlivych stadii choroby
- */
 std::string get_p(const periods& p, char c){
     std::string result;
     if(c == 'l')
@@ -44,7 +41,6 @@ std::string get_p(const periods& p, char c){
     return result;
 }
 
-
 int random_int(int min, int max){
     std::random_device os_seed;
     const uint_least32_t seed = os_seed();
@@ -55,18 +51,24 @@ int random_int(int min, int max){
 }
 
 Worker::Worker(position position, int id) {
-    int random = random_int(1, INITIAL_INFECTION_PROBABILITY);
+    /*
+     * Inicializujeme stav (nakazeny alebo náchylný)
+     */
+    int random = random_int(1, 100);
     Worker::id = id;
-    if(random <= 50) {
+    if(random <= (INITIAL_INFECTION_PROBABILITY)) {
         Worker::infected = true;
         Worker::susceptible = !this->infected;
         Worker::recovered = false;
-    }else if(random <= 1000){
+    }else{
         Worker::recovered = false;
         Worker::infected = false;
         Worker::susceptible = !this->infected;
     }
 
+    /*
+     * Predpokladame ze vyzdraveny sa uz nemoze znova nakazit
+     */
     Worker::pos = position;
     Worker::age = random_int(MIN_AGE, MAX_AGE);
     Worker::dead = false;
@@ -83,89 +85,93 @@ Worker::Worker(position position, int id) {
     Worker::movement_prob_before_symptoms = this->movement_prob;
 
     /*
-     * Creating Infection periods
+     * Pre datacollector informacie o nakazenom obdobi
      */
-    Worker::incubation_period_duration = random_int(MIN_INCUBATION_DURATION, MAX_INCUBATION_DURATION);
-    Worker::infectious_period_duration = random_int(MIN_INFECTIOUS_DURATION, MAX_INFECTIOUS_DURATION);
-    Worker::infectious_start_before_symptoms = random_int(MIN_INFECTIOUS_START_BEFORE_SYMPTOMS, MAX_INFECTIOUS_START_BEFORE_SYMPTOMS);
-    Worker::severe_symptoms_start = random_int(MIN_SEVERE_SYMPTOMS_START, MAX_SEVERE_SYMPTOMS_START);
-    Worker::fatality_occur = random_int(DEATH_OCCURENCE_MIN,DEATH_OCCURENCE_MAX + 1);
-    Worker::infectious_period_start = Worker::incubation_period_duration - Worker::infectious_start_before_symptoms;
-    Worker::removed_period_start = Worker::infectious_period_duration + Worker::infectious_period_start;
+    Worker::SD = 0;
+    Worker::not_SD = 0;
+    Worker::WM = 0;
+    Worker::not_WM = 0;
+
+    /*
+     * Vytvor periody infekcie
+     */
+    Worker::incubation_period_duration = random_int(MIN_INCUBATION_DURATION, MAX_INCUBATION_DURATION + 1);
+    Worker::infectious_period_duration = random_int(MIN_INFECTIOUS_DURATION, MAX_INFECTIOUS_DURATION + 1);
+    Worker::infectious_start_before_symptoms = random_int(MIN_INFECTIOUS_START_BEFORE_SYMPTOMS, MAX_INFECTIOUS_START_BEFORE_SYMPTOMS + 1);
+    Worker::severe_symptoms_start = random_int(MIN_SEVERE_SYMPTOMS_START, MAX_SEVERE_SYMPTOMS_START + 1);
+    Worker::fatality_occur = random_int(DEATH_OCCURRENCE_MIN,DEATH_OCCURRENCE_MAX + 1);
+
+    Worker::infectious_period_start = this->incubation_period_duration - this->infectious_start_before_symptoms;
+    Worker::removed_period_start = this->infectious_period_duration + this->infectious_period_start;
     Worker::total_length_infection = TOTAL_LENGTH_INFECTION;
     Worker::total_length = Worker::total_length_infection;
 
     Worker::infectious_periods->num.push_back(0);
     Worker::infectious_periods->period.emplace_back("latent");
-    Worker::infectious_periods->num.push_back(Worker::infectious_period_start);
+    Worker::infectious_periods->num.push_back(this->infectious_period_start);
     Worker::infectious_periods->period.emplace_back("infectious");
-    Worker::infectious_periods->num.push_back(Worker::removed_period_start);
+    Worker::infectious_periods->num.push_back(this->removed_period_start);
     Worker::infectious_periods->period.emplace_back("remove");
-    Worker::infectious_periods->num.push_back(Worker::total_length);
+    Worker::infectious_periods->num.push_back(this->total_length);
     Worker::infectious_periods->period.emplace_back("recover");
 
     /*
-     * Creating Symptoms periods
+     * Vytvor periody symptomov
      */
 
     Worker::symptoms_periods->num.push_back(0);
     Worker::symptoms_periods->period.emplace_back("incubation");
-    Worker::symptoms_start = Worker::incubation_period_duration;
-//    if(Worker::symptoms_start < Worker::infectious_period_start)
-//        cout<<"Symptoms ("<<Worker::symptoms_start<<") start during infectious stage (starts "<<infectious_period_start<<")"<<endl;
-//    if(Worker::symptoms_start > Worker::removed_period_start)
-//        cout<<"Symptoms ("<<Worker::symptoms_start<<") start during infectious stage (starts "<<infectious_period_start<<")"<<endl;
-    // 1) Some people are asymptomatic (and have no mild or severe symptoms, and also cant die)
-    if(random_int(1, 100) <= 35) {
-        Worker::symptoms_periods->num.push_back(Worker::symptoms_start);
+    Worker::symptoms_start = this->incubation_period_duration;
+
+    // 1) Niektori ludia budu asymptomaticki (nemaju ziande priznaky a nemozu zomriet)
+    if(random_int(1, 100) <= ASYMPTOMATIC_PROBABILITY) {
+        Worker::symptoms_periods->num.push_back(this->symptoms_start);
         Worker::symptoms_periods->period.emplace_back("asymptomatic");
     }
-    // 2) If they arent asymptomatic they start with mild
+    // 2) Ak nie je asymptomaticky tak zacina s jemnym priebehom
     else{
-        Worker::symptoms_periods->num.push_back(Worker::symptoms_start);
+        Worker::symptoms_periods->num.push_back(this->symptoms_start);
         Worker::symptoms_periods->period.emplace_back("mild");
-        // 3) Can have severe (or not)
-        if(random_int(1,100) <= 81){
-            Worker::severe_start_abs = Worker::severe_symptoms_start + symptoms_start;
-            Worker::symptoms_periods->num.push_back(Worker::severe_start_abs);
+        // 3) Moze mat tazky priebeh (or not)
+        if(random_int(1,100) <= SEVERITY_PROBABILITY){
+            Worker::severe_start_abs = this->severe_symptoms_start + this->symptoms_start;
+            Worker::symptoms_periods->num.push_back(this->severe_start_abs);
             Worker::symptoms_periods->period.emplace_back("severe");
-            // 4) Can die (or not)
-            if(random_int(1, 100) < 50){
-                Worker::fatality_start_abs = Worker::fatality_occur + Worker::severe_symptoms_start + Worker::symptoms_start;
-                Worker::symptoms_periods->num.push_back(Worker::fatality_start_abs);
+            // 4) Moze zomriet (alebo aj nie)
+            if(random_int(1, 100) <= DEATH_PROBABILITY){
+                Worker::fatality_start_abs = this->fatality_occur + this->severe_symptoms_start + this->symptoms_start;
+                Worker::symptoms_periods->num.push_back(this->fatality_start_abs);
                 Worker::symptoms_periods->period.emplace_back("death");
             }
         }
     }
-    // 5) If didnt die then recover
+    // 5) Ak nezomrel ale sa vyzdravel
     if(get_p(*Worker::symptoms_periods, 'l') != "death"){
-        Worker::symptoms_periods->num.push_back(Worker::total_length);
+        Worker::symptoms_periods->num.push_back(this->total_length);
         Worker::symptoms_periods->period.emplace_back("recover");
     }
 
     Worker::current_symptom_stage = "NONE";
     Worker::current_infection_stage = "NONE";
 
-    /*
-     * for datacollector
-     */
-    Worker::SD = 0;
-    Worker::not_SD = 0;
-    Worker::WM = 0;
-    Worker::not_WM = 0;
 }
 
 bool Worker::get_infected() {
     if(this->infected or this->recovered or this->infectious_spots->empty()){
         return false;
     }
-    float p;
-    float sum = 0.0;
+    double sum = 0.0;
     for(auto i = this->infectious_spots->begin(); i < this->infectious_spots->end(); i++){
-        sum += float(BASE_INFECTION_PROBABILITY) + float(-1. * (int(i->wear_mask) * float(MASK_INFECTION_DECREASE_PROB)));
+        sum += double(BASE_INFECTION_PROBABILITY) + double(-1. * (int(i->wear_mask) * double(MASK_INFECTION_DECREASE_PROB)));
     }
-    p = sum / double(this->infectious_spots->size());
-    auto infection_probability = float(pow(1 - (1 - p), this->infectious_spots->size()) * 100);
+
+    // 1 - (1 - p) ^ r
+    // p => sanca nakazenia jedne osoby, r => pocet infekcnych ludi
+    // Ak infekcny clovek ma masku, znizuje sancu nakazenia
+    double infection_probability;
+    double p = sum / double(this->infectious_spots->size());
+    infection_probability = double(pow(1 - (1 - p), this->infectious_spots->size()) * 100);
+
     if (random_int(1, 100) < int(infection_probability)) {
         this->infected = true;
         this->susceptible = true;
@@ -182,7 +188,6 @@ bool Worker::get_infected() {
 }
 
 bool Worker::progress_infection() {
-//    cout<<"progress_infection(start)"<<endl;
     if(!this->infected) {
         return false;
     }
@@ -198,10 +203,16 @@ bool Worker::progress_infection() {
             this->not_WM += 1;
     }
 
+    /*
+     * Urobime krok v infekcii
+     */
     this->infection_step += 1;
     bool new_infection_stage = false;
     bool new_symptoms_stage = false;
 
+    /*
+     * Kontrolujeme ci to ovplyvni stadium infekcie a symptomov
+     */
     if(this->infection_step == get_n(*this->infectious_periods, 'f')){
         this->current_infection_stage = get_p(*this->infectious_periods, 'f');
         this->infectious_periods->num.erase(this->infectious_periods->num.begin());
@@ -216,13 +227,19 @@ bool Worker::progress_infection() {
         new_symptoms_stage = true;
     }
 
+    /*
+     * Ak zomrel
+     */
     if(this->current_symptom_stage == "death"){
         this->susceptible = false;
         return true;
     }
 
+    /*
+     * Klasicky priebeh infekcie
+     */
     if(this->current_symptom_stage == "mild" and this->altruistic and new_symptoms_stage){
-        this->movement_prob = ALTRUISTIC_MOVEMENT_PROBABILITY;
+        this->movement_prob = this->low_movement_prob;
         this->wear_mask = true;
         this->social_distance = true;
     }
@@ -231,7 +248,6 @@ bool Worker::progress_infection() {
         this->wear_mask = true;
         this->social_distance = true;
     }
-
     if (this->current_infection_stage == "recover" and new_infection_stage){
         this->recovered = true;
         this->infected = false;
@@ -243,7 +259,6 @@ bool Worker::progress_infection() {
     }
     return false;
 }
-
 
 position Worker::get_position() const{
     return this->pos;

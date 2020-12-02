@@ -5,19 +5,23 @@
 
 using namespace std;
 
-
-
+/*
+ * Trieda automatu
+ */
 class CellularAutomat{
 public:
 
-    Worker *grid[GRID_WIDTH][GRID_HEIGHT];
-    Worker *workers[WORKERS];
-
+    /*
+     * Grid predstavuje "tovaren", workers je zoznam pracovnikov
+     */
+    Worker *grid[GRID_WIDTH][GRID_HEIGHT]{};
+    Worker *workers[WORKERS]{};
     DataCollector dataCollector;
+
     /*
      * Constructor of Automat
      */
-    CellularAutomat(DataCollector dc){
+    explicit CellularAutomat(DataCollector dc){
         this->dataCollector = std::move(dc);
         for(auto & open_position : this->grid){
             for(auto & x : open_position){
@@ -28,10 +32,9 @@ public:
     }
 
     /*
-     * Inicialization of grid with workers assigned random positions
+     * Inicializacia grid a pracovnikov na nahodne pozicie
      */
     void init_grid(){
-//        cout<<"init_grid(start)"<<endl;
         for(int w = 0; w < WORKERS; w++){
             position pos{};
             do {
@@ -41,14 +44,12 @@ public:
             this->create_worker(pos, w);
             workers[w] = get_worker(pos);
         }
-//        cout<<"init_grid(end)"<<endl;
     }
 
     /*
-     * Creates worker if the position is free
+     * Ak je pozicia volna vytvori na nej pracovnika
      */
     void create_worker(position p, int ID){
-//        cout<<"create_worker(start)"<<endl;
         if(check_point(p)){
             auto *worker = new Worker(p, ID);
             this->grid[p.x][p.y] = worker;
@@ -60,9 +61,11 @@ public:
             }
             this->dataCollector.update_data(worker);
         }
-//        cout<<"create_worker(end)"<<endl;
     }
 
+    /*
+     * Vymaze pracovnika z gridu a nastavi aby ho v dalsich iteraciach ignorovali
+     */
     void kill_worker(Worker *w){
         this->dataCollector.increment_dead();
         w->dead = true;
@@ -70,7 +73,7 @@ public:
     }
 
     /*
-     * If the position p is free and not out of boundaries function moves worker to the position p
+     * Ak je pozicia p volna a nie je mimo hranic gridu, premiestni tam pracovnika
      */
     bool move_worker(Worker *w, position p){
         position current_position = w->get_position();
@@ -86,8 +89,10 @@ public:
         }
     }
 
+    /*
+     * Updatuje hodnoty pracovnika
+     */
     bool update_worker(Worker* w){
-//        cout<<"update_worker(start)"<<endl;
         bool dead = w->progress_infection();
         if(dead){
             this->kill_worker(w);
@@ -95,16 +100,15 @@ public:
         }
         if (w->social_distance) {
             this->check_neighbors_SD(w);
-//            this->check_neighbors_n_SD(w);
         } else {
             this->check_neighbors_n_SD(w);
-//            this->check_neighbors_SD(w);
         }
-
-//        cout<<"update_grid(end)"<<endl;
         return true;
     }
 
+    /*
+     * Kontroluje okolite pozicie na volne miesta a na infekcnych susedov
+     */
     void check_neighbors(Worker *w){
         w->empty_spots->clear();
         w->infectious_spots->clear();
@@ -129,6 +133,9 @@ public:
         }
     }
 
+    /*
+     * Vola sa ak pracovnik nedodrzuje socialne distancovanie... ak sa pracovnik rozhodne 50/50 moze sa hybat kam chce
+     */
     bool check_neighbors_n_SD(Worker *w){
         this->check_neighbors(w);
         this->check_infection(w);
@@ -148,7 +155,9 @@ public:
         return true;
     }
 
-
+    /*
+     * Vola sa ak pracovnik dodrziava socialny distanc... Pracovnik ma obmedzeni pohyb tak aby okolo seba nemal inych pracovnikov
+     */
     bool check_neighbors_SD(Worker *w){
         this->check_neighbors(w);
         this->check_infection(w);
@@ -181,6 +190,9 @@ public:
         return true;
     }
 
+    /*
+     * Kontroluje ci je miesto kam sa chce pohnut bez pracovnikov v okoli
+     */
     bool check_if_safe(Worker *w, position i){
         if(&i == w->last_position)
             return false;
@@ -196,6 +208,9 @@ public:
         return true;
     }
 
+    /*
+     * Kontroluje ci sa pracovnik nakazil
+     */
     void check_infection(Worker *w){
         bool newly_infected = w->get_infected();
         if(newly_infected){
@@ -207,6 +222,10 @@ public:
         }
     }
 
+    /*
+     * Najprv sa prejdu pracovnici ktori nedodrzuju socialny distanc
+     * Potom ti ktori ho dodrzuju aby mohli na konci iteracie byt bez susedov
+     */
     void update_grid(){
         for(auto & worker : this->workers){
             if(!worker->dead and !worker->social_distance) {
@@ -225,7 +244,7 @@ public:
     }
 
     /*
-     * Prints present state of grid
+     * Vytlaci reprezentaciu gridu
      */
     void show_grid(){
         for(auto & open_position : this->grid){
@@ -233,7 +252,6 @@ public:
                 if(x != nullptr){
                     if(x->infected)
                         cout<<" 2 ";
-//                    cout<<"<"<<x->age<<">";
                     else if(x->recovered)
                         cout<<" 1 ";
                     else
@@ -251,14 +269,14 @@ public:
     }
 
     /*
-     * Checks if point is not out of bounds
+     * Zisti ci je pozicia mimo hranic gridu
      */
     bool oob(position p){
         return p.x < 0 or p.y < 0 or p.x >= GRID_HEIGHT or p.y >= GRID_WIDTH;
     }
 
     /*
-     * Checks if point is free
+     * Zisti ci je pozicia volna
      */
     bool check_point(position p) {
         if(!oob(p)) {
@@ -270,13 +288,19 @@ public:
         return false;
     }
 
+    /*
+     * Vracia pracovnika podla pozicie
+     */
     Worker* get_worker(position p){
         return this->grid[p.x][p.y];
     }
 
+    /*
+     * Spusti simulaciu pre pocet ITERATIONS
+     */
     int run(){
         int i;
-        for(i = 0; i < ITERATIONS; i++){
+        for(i = 1; i < ITERATIONS + 1; i++){
             this->dataCollector.reset(i, false);
             this->update_grid();
             cout<<"    <=== Day: "<<i<<" ===> "<<endl;
@@ -284,10 +308,10 @@ public:
             cout<<"Newly_infected:          "<<dataCollector.newly_infected<<endl;
             cout<<"Initial_infected:        "<<dataCollector.initial_infected<<endl;
             cout<<"Total_infected:          "<<dataCollector.get_total_infected()<<endl;
-            cout<<"Now dead:                "<<dataCollector.total_dead<<endl;
+            cout<<"Total dead:              "<<dataCollector.total_dead<<endl;
+            cout<<"Total recovered:         "<<dataCollector.current_data["R"]<<endl;
             cout<<"Now Susceptible:         "<<dataCollector.current_data["S"]<<endl;
             cout<<"Now infected:            "<<dataCollector.current_data["I"]<<endl;
-            cout<<"Now recovered:           "<<dataCollector.current_data["R"]<<endl;
             cout<<"Now wear_mask:           "<<dataCollector.current_data["WM"]<<endl;
             cout<<"Now social_d:            "<<dataCollector.current_data["SD"]<<endl;
             cout<<"Now mild:                "<<dataCollector.current_data["mild"]<<endl;
@@ -297,14 +321,21 @@ public:
             cout<<"Now total inf SD:        "<<dataCollector.adv_infection_data["SD"]<<endl;
             cout<<"Now total inf not_SD:    "<<dataCollector.adv_infection_data["not_SD"]<<endl;
         }
-        this->show_grid();
-        for( auto & data : dataCollector.current_data){
-            cout<<data.first<<endl;
-            for( auto & more : dataCollector.data_history[data.first])
-                cout<<more<<", ";
-            cout<<endl;
+
+        cout << endl << "History of information: " << endl;
+        for( auto & data : dataCollector.current_data) {
+            cout << data.first << endl;
+            for (auto &more : dataCollector.data_history[data.first])
+                cout << more << ", ";
+            cout << endl;
         }
-        cout<<dataCollector.current_data["death"]<<endl;
+        cout << endl << "Advanced informations about infected history:" << endl;
+        for( auto & data : dataCollector.adv_infection_data){
+            cout << data.first << endl;
+            for ( auto & more : dataCollector.adv_infection_data_history[data.first])
+                cout << more << ", ";
+            cout << endl;
+        }
         dataCollector.reset(i + 1, true);
         for(auto w : workers){
             free(w->symptoms_periods);
@@ -324,10 +355,15 @@ public:
 int main(int argc, char *argv[]) {
 
     DataCollector data_collector = DataCollector();
+
     auto *cellularAutomat = new CellularAutomat(data_collector);
+
     cellularAutomat->show_grid();
+
     cellularAutomat->run();
-    cout<<(random_int(1, 100) <= ALTRUISTIC_PROBABILITY)<<endl;
+
+    free(cellularAutomat);
+
     return 0;
 
 }

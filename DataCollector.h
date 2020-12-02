@@ -22,72 +22,74 @@ using namespace std;
 
 class DataCollector {
 public:
+    /*
+     * Konstruktor
+     */
     explicit DataCollector();
 
-    void increment_total_infected();
+    /*
+     * Updatuje aktualne data o stave vo fabrike
+     */
+    void update_data(Worker *pWorker);
+
+    /*
+     * Znova inicializuje premenne s datami na prazdne
+     */
+    void reset_data_options(bool hist);
+
+    /*
+     * Vrati pocet vsetkych nakazenych
+     */
+    int get_total_infected();
+
+    /*
+     * Zvysi pocet prvotnych nachylnych
+     */
+    void increment_initial_S();
+
+    /*
+     * Updatuje pokrocile informacie infikovanych
+     */
+    void update_adv_infection_data(Worker *pWorker);
+
+    /*
+     * Zvysi pocet mrtvych
+     */
+    void increment_dead();
+
+    /*
+     * Reset medzi iteraciami
+     */
+    void reset(int timestamp, bool last);
+
+    /*
+     * Zvysi pocet prvotnych infikovanych
+     */
+    void increment_initial_infected();
+
+    /*
+     * Zvysi pocet novych infikovanych
+     */
+    void increment_newly_infected();
 
     int total_infected;
 
     int initial_S;
 
-    void increment_dead();
-
     int total_dead;
-
-    void increment_initial_S();
-
-    void update_data(Worker *pWorker);
 
     map<string, int> current_data;
 
-    vector<int> mild;
-    vector<int> severe;
-    vector<int> asymptomatic;
-    vector<int> death;
-    vector<int> S;
-    vector<int> I;
-    vector<int> R;
-    vector<int> WM;
-    vector<int> SD;
     map<string, vector<int>> data_history;
 
     map<string, int> adv_infection_data;
 
     map<string, vector<int>> adv_infection_data_history;
 
-    void update_adv_infection_data(Worker *pWorker);
-
-    void reset(int timestamp, bool last);
-
-//    void add_lifetime_infected(int i, map<string, int> map);
-
-    void reset_data_options(bool hist);
-
-    int lifetime_infected_bin_size;
-
-    map<string, int> lifetime_infected_bin_avgs[ITERATIONS];
-
-    map<string, int> last_bin_avgs;
-
-    void add_lifetime_infected(Worker *worker);
-
-    vector<map<string, int>> current_bin_lifetime_infected;
-
-    void increment_initial_infected();
-
     int initial_infected;
-
-    void increment_newly_infected();
 
     int newly_infected;
 
-    int get_total_infected();
-
-    void increment_initial_recovered();
-
-    int initial_recovered;
 };
-
-
 
 #endif //IMS_DATACOLLECTOR_H
