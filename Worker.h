@@ -19,7 +19,7 @@
 #define GRID_WIDTH 75
 #define GRID_HEIGHT 75
 #define WORKERS 500
-#define ITERATIONS 50
+#define ITERATIONS 200
 #define AREA 1 // ake velke okolie berie do uvahy
 
 // WORKER CONSTANTS

@@ -1,5 +1,4 @@
 #include <utility>
-
 #include "Worker.h"
 #include "DataCollector.h"
 
@@ -17,6 +16,7 @@ public:
     Worker *grid[GRID_WIDTH][GRID_HEIGHT]{};
     Worker *workers[WORKERS]{};
     DataCollector dataCollector;
+    vector<Worker*> dead_w;
 
     /*
      * Constructor of Automat
@@ -51,15 +51,14 @@ public:
      */
     void create_worker(position p, int ID){
         if(check_point(p)){
-            auto *worker = new Worker(p, ID);
-            this->grid[p.x][p.y] = worker;
-            if(worker->infected){
+            this->grid[p.x][p.y] = new Worker(p, ID);
+            if(this->grid[p.x][p.y]->infected){
                 this->dataCollector.increment_initial_infected();
             }
-            else if(worker->susceptible){
+            else if(this->grid[p.x][p.y]->susceptible){
                 this->dataCollector.increment_initial_S();
             }
-            this->dataCollector.update_data(worker);
+            this->dataCollector.update_data(this->grid[p.x][p.y]);
         }
     }
 
@@ -69,6 +68,7 @@ public:
     void kill_worker(Worker *w){
         this->dataCollector.increment_dead();
         w->dead = true;
+        dead_w.push_back(this->grid[w->pos.x][w->pos.y]);
         this->grid[w->pos.x][w->pos.y] = nullptr;
     }
 
@@ -110,8 +110,10 @@ public:
      * Kontroluje okolite pozicie na volne miesta a na infekcnych susedov
      */
     void check_neighbors(Worker *w){
-        w->empty_spots->clear();
-        w->infectious_spots->clear();
+        delete w->empty_spots;
+        w->empty_spots = new vector<position>;
+        delete w->infectious_spots;
+        w->infectious_spots = new vector<Worker>;
         for (int y = -AREA; y <= AREA; y++) {
             for (int x = -AREA; x <= AREA; x++) {
                 if (x == 0 and y == 0) {
@@ -194,6 +196,7 @@ public:
      * Kontroluje ci je miesto kam sa chce pohnut bez pracovnikov v okoli
      */
     bool check_if_safe(Worker *w, position i){
+        position temp = i;
         if(&i == w->last_position)
             return false;
         for (int y = -AREA; y <= AREA; y++) {
@@ -201,8 +204,12 @@ public:
                 if (x == 0 and y == 0) {
                     continue;
                 }
-                if(this->grid[i.x + x][i.y + y])
-                    return false;
+                temp.x = i.x + x;
+                temp.y = i.y + y;
+                if(!oob(temp)) {
+                    if (this->grid[temp.x][temp.y])
+                        return false;
+                }
             }
         }
         return true;
@@ -216,7 +223,7 @@ public:
         if(newly_infected){
             w->susceptible = false;
             this->dataCollector.increment_newly_infected();
-            for(auto i = w->infectious_spots->begin(); i <= w->infectious_spots->end(); i++){
+            for(auto i = w->infectious_spots->begin(); i < w->infectious_spots->end(); i++){
                 i->num_people_infected +=1;
             }
         }
@@ -271,7 +278,7 @@ public:
     /*
      * Zisti ci je pozicia mimo hranic gridu
      */
-    bool oob(position p){
+    static bool oob(position p){
         return p.x < 0 or p.y < 0 or p.x >= GRID_HEIGHT or p.y >= GRID_WIDTH;
     }
 
@@ -303,7 +310,7 @@ public:
         for(i = 1; i < ITERATIONS + 1; i++){
             this->dataCollector.reset(i, false);
             this->update_grid();
-            cout<<"    <=== Day: "<<i<<" ===> "<<endl;
+            cout<<"    <=== Day: "<<i<<"  ===>"<<endl;
             cout<<"Initial_susceptible:     "<<dataCollector.initial_S<<endl;
             cout<<"Newly_infected:          "<<dataCollector.newly_infected<<endl;
             cout<<"Initial_infected:        "<<dataCollector.initial_infected<<endl;
@@ -319,7 +326,7 @@ public:
             cout<<"Now asymptomatic:        "<<dataCollector.current_data["asymptomatic"]<<endl;
             cout<<"Now total infected:      "<<dataCollector.adv_infection_data["total"]<<endl;
             cout<<"Now total inf SD:        "<<dataCollector.adv_infection_data["SD"]<<endl;
-            cout<<"Now total inf not_SD:    "<<dataCollector.adv_infection_data["not_SD"]<<endl;
+            cout<<"Now total inf not_SD:    "<<dataCollector.adv_infection_data["not_SD"]<< endl << endl;
         }
 
         cout << endl << "History of information: " << endl;
@@ -336,13 +343,22 @@ public:
                 cout << more << ", ";
             cout << endl;
         }
-        dataCollector.reset(i + 1, true);
         for(auto w : workers){
-            free(w->symptoms_periods);
-            free(w->infectious_periods);
-            free(w->empty_spots);
-            free(w->infectious_spots);
+            delete w->infectious_spots;
+            delete w->empty_spots;
+            delete w->infectious_periods;
+            delete w->symptoms_periods;
+            delete this->grid[w->pos.x][w->pos.y];
         }
+        for(auto &&dw : dead_w){
+//            delete dw->infectious_spots;
+//            delete dw->empty_spots;
+//            delete dw->infectious_periods;
+//            delete dw->symptoms_periods;
+            delete dw;
+        }
+        dataCollector.reset(i + 1, true);
+
         return 1;
     }
 
@@ -352,17 +368,15 @@ public:
 /* ------------------------------------ MAIN ----------------------------------- */
 /*                                                                               */
 
-int main(int argc, char *argv[]) {
+int main() {
 
     DataCollector data_collector = DataCollector();
 
-    auto *cellularAutomat = new CellularAutomat(data_collector);
+    CellularAutomat cellularAutomat = CellularAutomat(data_collector);
 
-    cellularAutomat->show_grid();
+    cellularAutomat.show_grid();
 
-    cellularAutomat->run();
-
-    free(cellularAutomat);
+    cellularAutomat.run();
 
     return 0;
 

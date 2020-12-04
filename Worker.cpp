@@ -9,7 +9,7 @@ using namespace std;
 /*
  * Nastavujeme ake vysoke percento pracovnikov bude dodrziavat restrikcie
  */
-int policy = POLICY_SAFETY_VERYHIGH;
+int policy = POLICY_SAFETY_MEDIUM;
 
 int get_n(const periods& p, char c){
     int result;
@@ -104,7 +104,7 @@ Worker::Worker(position position, int id) {
     Worker::infectious_period_start = this->incubation_period_duration - this->infectious_start_before_symptoms;
     Worker::removed_period_start = this->infectious_period_duration + this->infectious_period_start;
     Worker::total_length_infection = TOTAL_LENGTH_INFECTION;
-    Worker::total_length = Worker::total_length_infection;
+    Worker::total_length = this->total_length_infection;
 
     Worker::infectious_periods->num.push_back(0);
     Worker::infectious_periods->period.emplace_back("latent");
@@ -211,7 +211,7 @@ bool Worker::progress_infection() {
     bool new_symptoms_stage = false;
 
     /*
-     * Kontrolujeme ci to ovplyvni stadium infekcie a symptomov
+     * Kontrolujeme ci to ovplyvni stadium infekcie Fcouta symptomov
      */
     if(this->infection_step == get_n(*this->infectious_periods, 'f')){
         this->current_infection_stage = get_p(*this->infectious_periods, 'f');
@@ -220,13 +220,14 @@ bool Worker::progress_infection() {
         new_infection_stage = true;
     }
 
-    if(this->infection_step == get_n(*this->symptoms_periods, 'f')){
-        this->current_symptom_stage = get_p(*this->symptoms_periods, 'f');
-        this->symptoms_periods->num.erase(this->symptoms_periods->num.begin());
-        this->symptoms_periods->period.erase(this->symptoms_periods->period.begin());
-        new_symptoms_stage = true;
+    if(!this->symptoms_periods->num.empty()) {
+        if (this->infection_step == get_n(*this->symptoms_periods, 'f')) {
+            this->current_symptom_stage = get_p(*this->symptoms_periods, 'f');
+            this->symptoms_periods->num.erase(this->symptoms_periods->num.begin());
+            this->symptoms_periods->period.erase(this->symptoms_periods->period.begin());
+            new_symptoms_stage = true;
+        }
     }
-
     /*
      * Ak zomrel
      */
