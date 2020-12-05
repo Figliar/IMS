@@ -348,13 +348,10 @@ public:
             delete w->empty_spots;
             delete w->infectious_periods;
             delete w->symptoms_periods;
-            delete this->grid[w->pos.x][w->pos.y];
+            if(!w->dead)
+                delete this->grid[w->pos.x][w->pos.y];
         }
         for(auto &&dw : dead_w){
-//            delete dw->infectious_spots;
-//            delete dw->empty_spots;
-//            delete dw->infectious_periods;
-//            delete dw->symptoms_periods;
             delete dw;
         }
         dataCollector.reset(i + 1, true);

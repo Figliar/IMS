@@ -16,10 +16,10 @@
 #include <map>
 
 // GRID CONSTANTS
-#define GRID_WIDTH 75
-#define GRID_HEIGHT 75
-#define WORKERS 500
-#define ITERATIONS 200
+#define GRID_WIDTH 92
+#define GRID_HEIGHT 92
+#define WORKERS 900
+#define ITERATIONS 50
 #define AREA 1 // ake velke okolie berie do uvahy
 
 // WORKER CONSTANTS
