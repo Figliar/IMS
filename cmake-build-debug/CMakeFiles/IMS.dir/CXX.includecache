@@ -6,6 +6,10 @@
 
 #IncludeRegexTransform: 
 
+/home/rene/Desktop/IMS_projekt/IMS/DataCollector.cpp
+DataCollector.h
+/home/rene/Desktop/IMS_projekt/IMS/DataCollector.h
+
 /home/rene/Desktop/IMS_projekt/IMS/DataCollector.h
 map
 -
@@ -29,6 +33,10 @@ cmath
 -
 map
 -
+Worker.h
+/home/rene/Desktop/IMS_projekt/IMS/Worker.h
+
+/home/rene/Desktop/IMS_projekt/IMS/Worker.cpp
 Worker.h
 /home/rene/Desktop/IMS_projekt/IMS/Worker.h
 

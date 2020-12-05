@@ -1,5 +1,5 @@
-isabot: main.o DataCollector.o Worker.o
-	g++ -Wall -w -g -o main main.o DataCollector.o Worker.o -lssl -lcrypto
+main: main.o DataCollector.o Worker.o
+	g++ -Wall -w -g -o main main.o DataCollector.o Worker.o
 
 main.o: main.cpp DataCollector.h Worker.h
 	g++ -Wall -w -g -c main.cpp
