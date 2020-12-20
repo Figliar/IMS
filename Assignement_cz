@@ -1,0 +1,11 @@
+Obecné poznámky k zadáním typu "epidemiologické modely".
+Najděte publikovaný vědecký článek popisující model šíření nějaké nemoci a vlivu možných opatření (izolace, roušky, apod). Je preferováno, aby studie popisovala
+konkrétní nemoc, konkrétní lokalitu a obsahovala co nejkonkrétnější data. Proveďte vlastní implementaci popisovaného modelu, zopakujte experimenty z článku,
+případně doplňte další.
+
+U všech projektů je vítáno, když budou vycházet z publikovaného článku o nějakém modelu. Pozor, musí však být z důvěryhodného zdroje. 
+Je možno článek prostudovat, reimplementovat popisovaný model, zopakovat popisované experimenty, přidat vlastní experimenty.
+
+Téma č. 3: Epidemiologické modely - mikro-úroveň
+Zaměřte se na modelování šíření epidemie na malém území, kde dochází k většímu kontaktu mezi lidmi (hromadné akce jako hudební festivaly, dopravní prostředky, 
+výrobní podniky). Důraz na validitu.
